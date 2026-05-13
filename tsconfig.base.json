@@ -1,0 +1,24 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "moduleResolution": "Node",
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+    "noImplicitOverride": true,
+    "useUnknownInCatchVariables": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "baseUrl": ".",
+    "paths": {
+      "@cheesekit/tool-sdk": ["packages/tool-sdk/src/index.ts"],
+      "@cheesekit/core": ["packages/core/src/index.ts"],
+      "@cheesekit/chzzk-adapter": ["packages/chzzk-adapter/src/index.ts"],
+      "@cheesekit/llm-gateway": ["packages/llm-gateway/src/index.ts"],
+      "@cheesekit/storage": ["packages/storage/src/index.ts"],
+      "@cheesekit/manzai-bot": ["libraries/manzai-bot/src/index.ts"]
+    }
+  }
+}

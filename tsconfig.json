@@ -1,0 +1,12 @@
+{
+  "files": [],
+  "references": [
+    { "path": "./packages/tool-sdk" },
+    { "path": "./packages/llm-gateway" },
+    { "path": "./packages/chzzk-adapter" },
+    { "path": "./packages/core" },
+    { "path": "./packages/storage" },
+    { "path": "./libraries/manzai-bot" },
+    { "path": "./apps/desktop" }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "composite": true,
+    "noEmit": true,
+    "jsx": "react-jsx",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "types": ["node", "vite/client"]
+  },
+  "references": [
+    { "path": "../../packages/tool-sdk" },
+    { "path": "../../packages/core" },
+    { "path": "../../packages/chzzk-adapter" },
+    { "path": "../../packages/llm-gateway" },
+    { "path": "../../packages/storage" },
+    { "path": "../../libraries/manzai-bot" }
+  ],
+  "include": ["src/**/*.ts", "src/**/*.tsx", "vite.config.ts"]
+}
