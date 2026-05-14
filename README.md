@@ -112,6 +112,7 @@ The code includes typed TODO classes/interfaces for future CHZZK and OpenAI inte
 
 - [Architecture notes](docs/architecture.md)
 - [Portfolio case study](docs/portfolio-case-study.md)
+- [GitHub metadata note](docs/github-metadata.md)
 
 ## Portfolio Status
 
