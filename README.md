@@ -107,3 +107,19 @@ pnpm lint
 - Add a real OpenAI provider after user opt-in and secure API key handling.
 - Add more libraries through the `BroadcastTool` interface without changing `manzai-bot`.
 - Add persistent settings/log storage with a SQLite-ready implementation.
+## Demo Walkthrough
+
+실제 데모는 Mock CHZZK 연결 상태에서 `manzai-bot`을 켜고 자동 반응 메시지가 큐에 쌓이는 흐름입니다.
+
+1. `pnpm install`을 실행합니다.
+2. `pnpm dev`를 실행합니다.
+3. `manzai-bot` 카드의 체크박스를 눌러 `ON`으로 바꿉니다.
+4. `Reaction chance`, `Cooldown seconds` 값을 조정합니다.
+5. 오른쪽 `Send queue`에 자동 반응 메시지가 쌓이는지 확인합니다.
+6. 멈춰야 할 때는 `Emergency stop`을 누릅니다.
+
+![CheeseKit ready state](docs/demo-screenshots/cheese-kit-flow-01-open.png)
+
+![manzai-bot queue result](docs/demo-screenshots/cheese-kit-flow-02-manzai-on.png)
+
+![Emergency stop result](docs/demo-screenshots/cheese-kit-flow-03-emergency-stop.png)
