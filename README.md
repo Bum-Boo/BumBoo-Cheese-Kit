@@ -109,23 +109,23 @@ pnpm lint
 - Add persistent settings/log storage with a SQLite-ready implementation.
 ## Demo Walkthrough
 
-실제 데모는 Mock CHZZK 연결 상태에서 `manzai-bot`을 켜고 자동 반응 메시지가 큐에 쌓이는 흐름입니다.
+The demo flow turns on `manzai-bot` with the mock CHZZK adapter connected, then confirms that automated reaction messages are queued.
 
-1. `pnpm install`을 실행합니다.
-2. `pnpm dev`를 실행합니다.
-3. `manzai-bot` 카드의 체크박스를 눌러 `ON`으로 바꿉니다.
-4. `Reaction chance`, `Cooldown seconds` 값을 조정합니다.
-5. 오른쪽 `Send queue`에 자동 반응 메시지가 쌓이는지 확인합니다.
-6. 멈춰야 할 때는 `Emergency stop`을 누릅니다.
+1. Run `pnpm install`.
+2. Run `pnpm dev`.
+3. Click the checkbox on the `manzai-bot` card to switch it `ON`.
+4. Adjust `Reaction chance` and `Cooldown seconds`.
+5. Confirm that automated reaction messages appear in the `Send queue`.
+6. Click `Emergency stop` when the bot needs to stop immediately.
 
-처음 실행하면 연결 상태와 자동 반응 봇 카드가 보입니다. `manzai-bot` 카드의 체크박스가 아직 꺼져 있는 상태입니다.
+The first screen shows the connection state and the automated reaction bot card. The `manzai-bot` checkbox is still off.
 
 ![CheeseKit ready state](docs/demo-screenshots/cheese-kit-flow-01-open.png)
 
-`manzai-bot`을 켜면 오른쪽 `Send queue`에 자동 반응 메시지가 쌓입니다. 이 화면에서 확률과 쿨다운 값도 함께 확인할 수 있습니다.
+After `manzai-bot` is enabled, automated reaction messages appear in the `Send queue`. This screen also shows the current chance and cooldown settings.
 
 ![manzai-bot queue result](docs/demo-screenshots/cheese-kit-flow-02-manzai-on.png)
 
-문제가 생겼을 때는 `Emergency stop`을 눌러 큐를 멈추고 봇 상태를 정지시킵니다.
+Use `Emergency stop` to halt the queue and stop the bot state immediately.
 
 ![Emergency stop result](docs/demo-screenshots/cheese-kit-flow-03-emergency-stop.png)
