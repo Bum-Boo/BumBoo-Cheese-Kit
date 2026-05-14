@@ -1,29 +1,48 @@
 # CheeseKit
 
-CheeseKit is a local desktop root app for CHZZK live-streaming tools. The v0.1 goal is intentionally narrow: run one internal library, `manzai-bot`, on top of a safe local runtime.
+> Local desktop root app for CHZZK live-streaming tools and safe bot libraries.
 
-`manzai-bot` is a Boke/Tsukkomi-style AI chat tool. It receives normalized chat events from the root app and requests chat sends through `ToolContext.requestSendChat()`. It never calls CHZZK APIs, never reads tokens, and never sends chat directly.
+[Overview](README.md) | [English](docs/readme/README.en.md) | [Korean](docs/readme/README.ko.md) | [Chinese](docs/readme/README.zh-CN.md) | [Japanese](docs/readme/README.ja.md)
+
+| Area | Detail |
+|---|---|
+| Platform | Electron desktop app |
+| Stack | TypeScript, React, pnpm workspace |
+| Current adapter | Mock CHZZK adapter |
+| First tool | `manzai-bot`, a short Korean-first reaction bot |
+| Safety stance | Root-owned send queue, cooldown, duplicate protection, emergency stop |
+
+## Preview
+
+The desktop root app starts with a mock CHZZK connection and a controllable internal bot card.
+
+![CheeseKit ready state](docs/demo-screenshots/cheese-kit-flow-01-open.png)
+
+<details>
+<summary>View demo walkthrough</summary>
+
+1. Run `pnpm install`.
+2. Run `pnpm dev`.
+3. Click the checkbox on the `manzai-bot` card to switch it `ON`.
+4. Adjust `Reaction chance` and `Cooldown seconds`.
+5. Confirm that automated reaction messages appear in the `Send queue`.
+6. Click `Emergency stop` when the bot needs to stop immediately.
+
+![manzai-bot queue result](docs/demo-screenshots/cheese-kit-flow-02-manzai-on.png)
+
+![Emergency stop result](docs/demo-screenshots/cheese-kit-flow-03-emergency-stop.png)
+
+</details>
 
 ## Current v0.1 Scope
 
 - pnpm workspace monorepo.
 - Electron + React + TypeScript desktop app.
 - Safe Electron preload/IPC boundary.
-- Mock CHZZK adapter for connection, chat events, send success, send failure, expired token, and disconnected session errors.
-- Root-owned event bus, tool runner, send queue, config, logger, and basic storage interfaces.
+- Mock CHZZK adapter for connection, chat events, send success/failure, expired token, and disconnected session errors.
+- Root-owned event bus, tool runner, send queue, config, logger, and storage interfaces.
 - Mock LLM provider.
-- `manzai-bot` internal library with safety checks, short Korean-first manzai responses, and unit tests.
-
-## Not Implemented Yet
-
-- Real CHZZK OAuth.
-- Real CHZZK live/session/chat network clients.
-- Secret storage or token refresh.
-- Renderer-side credential handling.
-- Full broadcast-suite features.
-- Real OpenAI provider execution.
-
-The code includes typed TODO classes/interfaces for future CHZZK and OpenAI integration, but v0.1 does not attempt to use real credentials.
+- `manzai-bot` internal library with safety checks, short Korean-first responses, and unit tests.
 
 ## Architecture Overview
 
@@ -43,42 +62,29 @@ packages/chzzk-adapter
   auth/session/chat/live interfaces, mock clients, normalized event mapper
 
 packages/llm-gateway
-  LLM provider interface implementation and mock provider
-
-packages/storage
-  settings/log abstractions
+  LLM provider interface and mock provider
 
 libraries/manzai-bot
   first internal library, depends only on @cheesekit/tool-sdk
 ```
 
-Root app responsibilities:
+## Safety Model
 
-- Authentication and future token storage.
-- CHZZK session/event connection.
-- Normalized event routing.
-- Send queue ownership.
-- 100-character validation.
-- Cooldown and duplicate-message protection.
-- Logging and UI state.
-- Tool lifecycle management.
-- Global emergency stop and per-tool stop.
+- `manzai-bot` never calls CHZZK APIs directly.
+- `manzai-bot` never reads tokens and never sends chat directly.
+- The root app owns the send queue.
+- The root queue enforces message length, cooldown, queue length, and duplicate protection.
+- The UI exposes pause sending, stop `manzai-bot`, clear queue, and emergency stop controls.
+- `manzai-bot` must not impersonate real viewers or pretend to be human.
+- Tools must not mass-send chat.
+- Unsafe viewer messages are skipped.
 
-Library responsibilities:
-
-- React to normalized `BroadcastEvent` objects.
-- Use only safe `ToolContext` capabilities.
-- Request chat sends through `requestSendChat()`.
-- Keep responses short, non-escalating, and visibly bot/tool generated.
-
-## Run
+## Quick Start
 
 ```bash
 pnpm install
 pnpm dev
 ```
-
-`pnpm dev` builds internal packages, starts Vite, builds Electron main/preload in watch mode, and launches the desktop app.
 
 ## Validate
 
@@ -91,23 +97,22 @@ pnpm lint
 
 `pnpm lint` is currently a no-op placeholder because no lint configuration has been added yet.
 
-## Safety Rules
+## Not Implemented Yet
 
-- `manzai-bot` must not impersonate real viewers or pretend to be human.
-- Tools must not mass-send chat.
-- The root send queue enforces `maxMessageLength: 100`, cooldown, queue length, and duplicate protection.
-- Unsafe viewer messages are skipped, including harassment, sexual content involving minors, self-harm instructions, doxxing, credentials, and illegal instructions.
-- The UI exposes pause sending, stop `manzai-bot`, clear queue, and emergency stop controls.
+- Real CHZZK OAuth.
+- Real CHZZK live/session/chat network clients.
+- Secret storage or token refresh.
+- Renderer-side credential handling.
+- Full broadcast-suite features.
+- Real OpenAI provider execution.
 
-## Portfolio case study
+The code includes typed TODO classes/interfaces for future CHZZK and OpenAI integration, but v0.1 does not attempt to use real credentials.
 
-For a higher-level explanation of the product framing, local runtime architecture, safety model, and next steps, see [docs/portfolio-case-study.md](docs/portfolio-case-study.md).
+## Documentation
 
-## Future TODOs
+- [Architecture notes](docs/architecture.md)
+- [Portfolio case study](docs/portfolio-case-study.md)
 
-- Add secure local credential storage before real CHZZK OAuth.
-- Implement real CHZZK OAuth/session/chat clients inside `packages/chzzk-adapter`.
-- Add token refresh and adapter error recovery in the Electron main process only.
-- Add a real OpenAI provider after user opt-in and secure API key handling.
-- Add more libraries through the `BroadcastTool` interface without changing `manzai-bot`.
-- Add persistent settings/log storage with a SQLite-ready implementation.
+## Portfolio Status
+
+CheeseKit is an important secondary project until its release path, preview assets, real-adapter boundary, and public case study are polished enough to replace one of the six pinned repositories.
