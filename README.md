@@ -113,6 +113,10 @@ pnpm lint
 - Unsafe viewer messages are skipped, including harassment, sexual content involving minors, self-harm instructions, doxxing, credentials, and illegal instructions.
 - The UI exposes pause sending, stop `manzai-bot`, clear queue, and emergency stop controls.
 
+## Portfolio case study
+
+For a higher-level explanation of the product framing, local runtime architecture, safety model, and next steps, see [docs/portfolio-case-study.md](docs/portfolio-case-study.md).
+
 ## Future TODOs
 
 - Add secure local credential storage before real CHZZK OAuth.
