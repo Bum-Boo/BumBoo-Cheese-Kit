@@ -118,8 +118,14 @@ pnpm lint
 5. 오른쪽 `Send queue`에 자동 반응 메시지가 쌓이는지 확인합니다.
 6. 멈춰야 할 때는 `Emergency stop`을 누릅니다.
 
+처음 실행하면 연결 상태와 자동 반응 봇 카드가 보입니다. `manzai-bot` 카드의 체크박스가 아직 꺼져 있는 상태입니다.
+
 ![CheeseKit ready state](docs/demo-screenshots/cheese-kit-flow-01-open.png)
 
+`manzai-bot`을 켜면 오른쪽 `Send queue`에 자동 반응 메시지가 쌓입니다. 이 화면에서 확률과 쿨다운 값도 함께 확인할 수 있습니다.
+
 ![manzai-bot queue result](docs/demo-screenshots/cheese-kit-flow-02-manzai-on.png)
+
+문제가 생겼을 때는 `Emergency stop`을 눌러 큐를 멈추고 봇 상태를 정지시킵니다.
 
 ![Emergency stop result](docs/demo-screenshots/cheese-kit-flow-03-emergency-stop.png)
