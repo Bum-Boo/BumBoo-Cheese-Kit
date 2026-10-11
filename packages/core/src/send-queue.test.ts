@@ -22,6 +22,37 @@ function request(id: string, message: string, createdAt = 0): SendChatRequest {
 }
 
 describe("SendQueue", () => {
+  it.each(["pause", "emergency"])("keeps later messages queued when %s happens during a send", async (stop) => {
+    let finishSend!: () => void;
+    const sent: string[] = [];
+    const queue = new SendQueue({
+      chatSender: { async sendChat(message) {
+        sent.push(message);
+        if (sent.length === 1) await new Promise<void>(resolve => { finishSend = resolve; });
+      } },
+      logger: new MemoryLogger(), clock: new FixedClock(1000),
+      settings: { cooldownSeconds: 0 },
+    });
+    queue.enqueue(request("first", "first"));
+    queue.enqueue(request("second", "second"));
+    const flushing = queue.flushReady();
+    if (stop === "pause") queue.pause(); else queue.setEmergencyStop(true);
+    finishSend();
+    await flushing;
+    expect(sent).toEqual(["first"]);
+    expect(queue.getSnapshot().queue.map(entry => entry.request.id)).toEqual(["second"]);
+    queue.resume();
+    await queue.flushReady();
+    expect(sent).toEqual(["first", "second"]);
+  });
+
+  it("does not expose internal log entries through its snapshot", () => {
+    const queue = new SendQueue({ chatSender: new FakeChatSender(), logger: new MemoryLogger(), clock: new FixedClock() });
+    queue.enqueue(request("one", "original"));
+    queue.getSnapshot().logs[0]!.message = "externally changed";
+    expect(queue.getSnapshot().logs[0]!.message).toBe("original");
+  });
+
   it("truncates or rejects messages over the configured limit", () => {
     const clock = new FixedClock(1000);
     const sender = new FakeChatSender();

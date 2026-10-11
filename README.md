@@ -36,10 +36,15 @@ pnpm dev
 pnpm typecheck
 pnpm test
 pnpm build
+pnpm test:desktop
 pnpm lint
 ```
 
 `pnpm lint`는 아직 린트 설정이 없어 안내 문구만 출력하는 placeholder입니다.
+
+`pnpm test:desktop`은 빌드한 뒤 숨긴 Electron 창에서 실제 preload, renderer, IPC 등록 함수와 AppService의 연결·긴급 정지·재개를 검사합니다. 임시 userData를 사용하며 HTTP 요청을 차단합니다. 이 harness는 앱의 실제 main startup과 before-quit hook을 실행하지 않습니다. 빌드 에셋은 상대 경로를 사용해 로컬 `file://` 실행에서도 로드됩니다.
+
+전송 도중 일시 정지하거나 긴급 정지하면 현재 전송이 끝난 뒤 다음 항목을 대기열에 보존합니다. 이미 시작한 전송을 취소하지는 않습니다. 대기열 스냅샷의 로그를 수정해도 내부 로그에는 반영되지 않으며, 오류 이벤트 처리 실패는 로그로 남기고 같은 오류 이벤트를 재발행하지 않습니다. 단위 검사는 모의 어댑터를 사용하고 실제 CHZZK 연결은 수행하지 않습니다.
 
 ## 안전·개인정보·플랫폼 정책
 
