@@ -175,6 +175,7 @@ export class SendQueue {
     this.processing = true;
     try {
       while (this.entries.length > 0) {
+        if (this.paused || this.emergencyStopped) return;
         const entry = this.entries[0];
         if (!entry) {
           return;
@@ -261,7 +262,7 @@ export class SendQueue {
       paused: this.paused,
       emergencyStopped: this.emergencyStopped,
       queue: this.entries.map((entry) => ({ ...entry, request: { ...entry.request } })),
-      logs: [...this.logs],
+      logs: this.logs.map((entry) => ({ ...entry })),
       ...(this.lastSentAtValue !== undefined ? { lastSentAt: this.lastSentAtValue } : {})
     };
   }

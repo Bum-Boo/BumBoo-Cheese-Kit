@@ -81,6 +81,28 @@ function chatEvent(id: string): BroadcastEvent {
 }
 
 describe("ToolRunner", () => {
+  it("does not recursively publish errors from an error-event handler", async () => {
+    const eventBus = new EventBus();
+    const clock = new FixedClock();
+    const runner = new ToolRunner({
+      logger: new MemoryLogger(), config: new MemoryConfigStore(),
+      sendQueue: new SendQueue({ chatSender: new NoopSender(), logger: new MemoryLogger(), clock }),
+      llm, clock, random: new SequenceRandomSource([0]), eventBus,
+    });
+    const tool = new FakeTool();
+    let calls = 0;
+    tool.onEvent = async () => {
+      calls += 1;
+      // Bound the old behavior so the failing regression cannot recurse forever.
+      if (calls <= 8) throw new Error("synthetic handler failure");
+    };
+    runner.register(tool);
+    eventBus.subscribeAll(event => runner.routeEvent(event));
+    await runner.startTool(tool.id);
+    expect(calls).toBe(2);
+    expect(eventBus.getHistory().filter(event => event.type === "SYSTEM_ERROR")).toHaveLength(1);
+  });
+
   it("starts and stops registered tools", async () => {
     const runner = new ToolRunner({
       logger: new MemoryLogger(),

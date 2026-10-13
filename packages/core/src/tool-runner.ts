@@ -118,6 +118,9 @@ export class ToolRunner {
             eventType: event.type,
             error: message
           });
+          // Report the original failure once; a failing diagnostic handler must
+          // not recursively create more diagnostic events.
+          if (event.type === "SYSTEM_ERROR") return;
           await this.options.eventBus?.publish({
             id: `system_error_${tool.id}_${this.options.clock.now()}`,
             type: "SYSTEM_ERROR",
