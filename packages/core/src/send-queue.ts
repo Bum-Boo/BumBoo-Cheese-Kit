@@ -158,7 +158,9 @@ export class SendQueue {
     this.lastBotMessage = { message, createdAt: now };
     this.log("accepted", message, request.toolId);
     this.logger.info("Accepted send chat request.", { toolId: request.toolId, requestId: request.id });
-    void this.publishSendRequested(acceptedRequest);
+    void this.publishSafely("SEND_CHAT_REQUESTED", () =>
+      this.publishSendRequested(acceptedRequest)
+    );
 
     return {
       accepted: true,
@@ -195,16 +197,6 @@ export class SendQueue {
 
         try {
           await this.chatSender.sendChat(entry.request.message);
-          const sentAt = this.clock.now();
-          entry.status = "sent";
-          entry.updatedAt = sentAt;
-          this.lastSentAtValue = sentAt;
-          this.log("sent", entry.request.message, entry.request.toolId);
-          this.logger.info("Sent chat message.", {
-            toolId: entry.request.toolId,
-            requestId: entry.request.id
-          });
-          await this.publishChatSent(entry.request);
         } catch (error) {
           const failedAt = this.clock.now();
           const reason = error instanceof Error ? error.message : "Unknown send failure.";
@@ -217,8 +209,23 @@ export class SendQueue {
             requestId: entry.request.id,
             reason
           });
-          await this.publishChatFailed(entry.request, reason);
+          await this.publishSafely("CHAT_SEND_FAILED", () =>
+            this.publishChatFailed(entry.request, reason)
+          );
+          continue;
         }
+
+        const sentAt = this.clock.now();
+        entry.status = "sent";
+        entry.updatedAt = sentAt;
+        this.lastSentAtValue = sentAt;
+        this.log("sent", entry.request.message, entry.request.toolId);
+        this.logger.info("Sent chat message.", {
+          toolId: entry.request.toolId,
+          requestId: entry.request.id
+        });
+        // A failing subscriber must not turn a delivered message into a failed one.
+        await this.publishSafely("CHAT_SENT", () => this.publishChatSent(entry.request));
       }
     } finally {
       this.processing = false;
@@ -311,6 +318,20 @@ export class SendQueue {
     this.logs.push(entry);
     while (this.logs.length > 200) {
       this.logs.shift();
+    }
+  }
+
+  private async publishSafely(
+    eventType: BroadcastEvent["type"],
+    publish: () => Promise<void>
+  ): Promise<void> {
+    try {
+      await publish();
+    } catch (error) {
+      this.logger.error("Send queue event subscriber failed.", {
+        eventType,
+        error: error instanceof Error ? error.message : String(error)
+      });
     }
   }
 
