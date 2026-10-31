@@ -29,6 +29,9 @@ export class ToolRunner {
   private readonly tools = new Map<string, BroadcastTool>();
   private readonly activeTools = new Set<string>();
   private readonly initializedTools = new Set<string>();
+  // Tools allowed to request chat; cleared as soon as a stop begins so work that
+  // was in flight when the stop arrived cannot enqueue after a later resume.
+  private readonly sendingTools = new Set<string>();
   private readonly logger: Logger;
 
   constructor(private readonly options: ToolRunnerOptions) {
@@ -54,6 +57,7 @@ export class ToolRunner {
     const tool = this.requireTool(toolId);
     await this.initTool(tool);
 
+    this.sendingTools.add(toolId);
     try {
       await tool.start();
       this.activeTools.add(toolId);
@@ -66,6 +70,7 @@ export class ToolRunner {
         toolId
       });
     } catch (error) {
+      this.sendingTools.delete(toolId);
       this.logger.error("Tool failed to start.", {
         toolId,
         error: error instanceof Error ? error.message : String(error)
@@ -76,6 +81,7 @@ export class ToolRunner {
 
   async stopTool(toolId: string): Promise<void> {
     const tool = this.requireTool(toolId);
+    this.sendingTools.delete(toolId);
 
     try {
       await tool.stop();
@@ -174,6 +180,15 @@ export class ToolRunner {
 
         if (input.metadata !== undefined) {
           request.metadata = input.metadata;
+        }
+
+        if (!this.sendingTools.has(tool.id)) {
+          this.logger.warn("Rejected chat request from a stopped tool.", { toolId: tool.id });
+          return Promise.resolve({
+            accepted: false,
+            requestId: request.id,
+            reason: "Tool is not running."
+          });
         }
 
         return Promise.resolve(this.options.sendQueue.enqueue(request));
